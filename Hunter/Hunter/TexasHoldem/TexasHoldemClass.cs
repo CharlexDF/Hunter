@@ -39,7 +39,6 @@ namespace Hunter
         public int id;
         public int iColor;
         public int iNumber;
-        public bool bUsed;
         public int GetId()
         {
             return (iColor - 1) * 13 + iNumber;

@@ -42,9 +42,8 @@ namespace Hunter
     {
         public static SortedList<int, Card> AllCardList = new SortedList<int, Card>();
         public static SortedList<int, Result> ResultList = new SortedList<int, Result>();
-        public static string sResult = "";
         
-        public static SortedList<int, Card> GetAllCardList()
+        public static SortedList<int, Card> CreateAllCardList()
         {
             if (AllCardList.Count != 0)
             {
@@ -59,7 +58,6 @@ namespace Hunter
                     card.id = id++;
                     card.iColor = iColor;
                     card.iNumber = iNum;
-                    card.bUsed = false;
                     AllCardList.Add(card.id, card);
                 }
             }
@@ -67,6 +65,24 @@ namespace Hunter
             return AllCardList;
         }
 
+        public static List<Card> GetAllCardList()
+        {
+            List<Card> cardList = new List<Card>();
+            int id = 1;
+            for (int iColor = 1; iColor <= Color.Count; iColor++)
+            {
+                for (int iNum = 1; iNum <= 13; iNum++)
+                {
+                    Card card = new Card();
+                    card.id = id++;
+                    card.iColor = iColor;
+                    card.iNumber = iNum;
+                    cardList.Add(card);
+                }
+            }
+            //PrintAllCard();
+            return cardList;
+        }
         public static void PrintAllCard()
         {
             foreach (var item in AllCardList)
@@ -76,25 +92,19 @@ namespace Hunter
                     + " number = " + item.Value.iNumber);
             }
         }
-
-        public static void CalcBeginWinRate()
-        {
-            GetAllCardList();
-            List<Card> poolList = new List<Card>();
-            foreach (var item in AllCardList)
-            {
-                poolList.Add(item.Value);
-            }
-            PermutationCombination(poolList, null, 9);
-        }
         
-        public static void PermutationCombination(List<Card> poolList, List<Card> retList, int iNum)
+        public static void Permutation(List<Card> poolList, int iNum, List<Card> retList = null)
         {
             Debug.Assert(iNum > 0);
+            Debug.Assert(poolList.Count >= iNum);
+
+            if (retList == null)
+            {
+                retList = new List<Card>();
+            }
 
             if (iNum == 1)
             {
-                Debug.Assert(retList != null);
 
                 foreach (var item in poolList)
                 {
@@ -105,31 +115,65 @@ namespace Hunter
                 return;
             }
 
-            if (retList == null)
-            {
-                retList = new List<Card>();
-            }
-
             List<Card> next_poolList = new List<Card>();
             foreach (var item in poolList)
             {
                 next_poolList.Add(item);
             }
-
             foreach (var item in poolList)
             {
                 retList.Add(item);
                 next_poolList.Remove(item);
 
-                PermutationCombination(next_poolList, retList, iNum - 1);
+                Permutation(next_poolList, iNum - 1, retList);
 
                 retList.Remove(item);
                 next_poolList.Add(item);
             }
         }
 
+        public static void Combination(List<Card> poolList, int iNum, List<Card> retList = null)//<T>
+        {
+            Debug.Assert(iNum > 0);
+            Debug.Assert(poolList.Count >= iNum);
+
+            if (retList == null)
+            {
+                retList = new List<Card>();
+            }
+
+            if (iNum == 1)
+            {
+                foreach (var item in poolList)
+                {
+                    retList.Add(item);
+                    GetHandResult(retList);
+                    retList.Remove(item);
+                }
+                return;
+            }
+            
+            List<Card> next_poolList = new List<Card>();
+            foreach (var item in poolList)
+            {
+                next_poolList.Add(item);
+            }
+            for (int i = 0; i < poolList.Count - 1; i++)
+            {
+                var item = poolList[i];
+                retList.Add(item);
+                next_poolList.Remove(item);
+
+                Combination(next_poolList, iNum - 1, retList);
+
+                retList.Remove(item);
+            }
+        }
+
+        public static int IterationCount = 0;
         public static void GetHandResult(List<Card> retList)
         {
+            IterationCount++;
             /*
             List<Card> playerA_Cards = new List<Card>();
             List<Card> playerB_Cards = new List<Card>();
@@ -164,6 +208,15 @@ namespace Hunter
             */
         }
 
+        public static void CalcBeginWinRate()
+        {
+            List<Card> poolList = GetAllCardList();
+            //Permutation(poolList, 9);
+            Combination(poolList, 2);
+            Console.WriteLine("CalcBeginWinRate IterationCount = " + IterationCount);
+        }
+
+        #region #Compare
         public static int REqual = 0;
         public static int RWin = 1;
         public static int RLose = -1;
@@ -198,7 +251,7 @@ namespace Hunter
         }
         public static bool IsFourKind(List<Card> cardList)
         {
-            int iMaxSameNumCount = GetMaxSameNumCount(cardList);
+            int iMaxSameNumCount = 0;
             return iMaxSameNumCount == 4;
         }
         public static bool IsThreeKind(List<Card> cardList)
@@ -301,47 +354,8 @@ namespace Hunter
             return retCards;
         }
 
-        public static List<List<T>> Combination<T>(List<T> srcList, int iNum)
-        {
-            int iCount = srcList.Count;
-            List<List<T>> ret = new List<List<T>>();
+        #endregion #Compare
 
-            Debug.Assert(srcList.Count > 0);
-            Debug.Assert(srcList.Count >= iNum);
-
-            if (iNum == 1)
-            {
-                for (int i = 0; i < srcList.Count; i++)
-                {
-                    List<T> pro = new List<T>();
-                    pro.Add(srcList[i]);
-                    ret.Add(pro);
-                }
-            }
-            else if (iNum > 1)
-            {
-                for (int i = 0; i < srcList.Count; i++)
-                {
-                    List<T> subList = new List<T>();
-                    foreach (var item in srcList)
-                    {
-                        subList.Add(item);
-                    }
-
-                    T t = subList[i];
-                    subList.RemoveAt(i);
-
-                    List<List<T>> subRet = Combination(subList, iNum - 1);
-                    foreach (var item in subRet)
-                    {
-                        item.Add(t);
-                        ret.Add(item);
-                    }
-                }
-            }
-
-            return ret;
-        }
 
         public static void Test()
         {
