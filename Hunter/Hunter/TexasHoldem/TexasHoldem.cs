@@ -160,6 +160,10 @@ namespace Hunter
             }
             for (int i = 0; i < poolList.Count - 1; i++)
             {
+                if (next_poolList.Count < iNum)
+                {
+                    return;
+                }
                 var item = poolList[i];
                 retList.Add(item);
                 next_poolList.Remove(item);
@@ -211,8 +215,20 @@ namespace Hunter
         public static void CalcBeginWinRate()
         {
             List<Card> poolList = GetAllCardList();
+            List<Card> hands = new List<Card>();
+            Card cSA = poolList.Find(p => p.iColor == Color.Spade && p.iNumber == 1);
+            Card cHA = poolList.Find(p => p.iColor == Color.Heart && p.iNumber == 1);
+            //Card cCA = poolList.Find(p => p.iColor == Color.Club && p.iNumber == 1);
+            //Card cDA = poolList.Find(p => p.iColor == Color.Diamond && p.iNumber == 1);
+            poolList.Remove(cSA);
+            poolList.Remove(cHA);
+            //poolList.Remove(cCA);
+            //poolList.Remove(cDA);
+            hands.Add(cSA);
+            hands.Add(cHA);
+
+            Combination(poolList, 5, hands);
             //Permutation(poolList, 9);
-            Combination(poolList, 2);
             Console.WriteLine("CalcBeginWinRate IterationCount = " + IterationCount);
         }
 
