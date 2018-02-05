@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Hunter
+namespace Hunter.TexasHoldem
 {
     public class Color
     {
@@ -46,6 +46,11 @@ namespace Hunter
         public static int CountId(int iColor, int iNumber)
         {
             return (iColor - 1) * 13 + iNumber;
+        }
+        public static string ToString(Card inCard)
+        {
+            string strCard = inCard.Print();
+            return strCard;
         }
         public string Print()
         {

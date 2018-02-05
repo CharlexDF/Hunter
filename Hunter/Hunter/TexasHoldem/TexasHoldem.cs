@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Diagnostics;
 using Hunter.Tools;
 
-namespace Hunter
+namespace Hunter.TexasHoldem
 {
     public class Result
     {
@@ -175,7 +175,7 @@ namespace Hunter
         }
 
         public static int IterationCount = 0;
-        public static void GetHandResult(List<Card> retList)
+        public static void GetHandResult(List<Card> inCardList)
         {
             IterationCount++;
             /*
@@ -203,31 +203,36 @@ namespace Hunter
             CompareCards(playerA_Cards, playerB_Cards);
             */
 
-            /*
-            foreach (var item in retList)
+            CardStatistics.RecordPlayerACard(inCardList);
+            bool bNeedPrint = false;
+            if (bNeedPrint)
             {
-                Console.Write(" " + item.Print());
+                foreach (var item in inCardList)
+                {
+                    Console.Write(" " + item.Print());
+                }
+                Console.Write("\n\n");
             }
-            Console.Write("\n\n");
-            */
         }
 
         public static void CalcBeginWinRate()
         {
             List<Card> poolList = GetAllCardList();
             List<Card> hands = new List<Card>();
-            Card cSA = poolList.Find(p => p.iColor == Color.Spade && p.iNumber == 1);
-            Card cHA = poolList.Find(p => p.iColor == Color.Heart && p.iNumber == 1);
+            //Card cSA = poolList.Find(p => p.iColor == Color.Spade && p.iNumber == 1);
+            //Card cHA = poolList.Find(p => p.iColor == Color.Heart && p.iNumber == 1);
+            //poolList.Remove(cSA);
+            //poolList.Remove(cHA);
+            //hands.Add(cSA);
+            //hands.Add(cHA);
+
             //Card cCA = poolList.Find(p => p.iColor == Color.Club && p.iNumber == 1);
             //Card cDA = poolList.Find(p => p.iColor == Color.Diamond && p.iNumber == 1);
-            poolList.Remove(cSA);
-            poolList.Remove(cHA);
             //poolList.Remove(cCA);
             //poolList.Remove(cDA);
-            hands.Add(cSA);
-            hands.Add(cHA);
 
-            Combination(poolList, 5, hands);
+            Combination(poolList, 2, hands);
+            CardStatistics.WriteHandCardList();
             //Permutation(poolList, 9);
             Console.WriteLine("CalcBeginWinRate IterationCount = " + IterationCount);
         }

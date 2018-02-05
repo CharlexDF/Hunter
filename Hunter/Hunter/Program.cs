@@ -1,4 +1,5 @@
 ﻿using System;
+using Hunter.TexasHoldem;
 
 namespace Hunter
 {
@@ -43,7 +44,7 @@ namespace Hunter
         {
             Console.WriteLine("Program Start Run...");
 
-            TexasHoldem.Test();
+            TexasHoldem.TexasHoldem.Test();
 
             Console.WriteLine("Program Finish Run...");
             Console.ReadKey();
