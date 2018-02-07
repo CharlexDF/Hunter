@@ -11,14 +11,12 @@ namespace Hunter.TexasHoldem
     public class Result
     {
         public int id;
-        public Card card1;
-        public Card card2;
         public int iWinRate;
     }
     
-    public class HandRateStatistics
+    public class HandCardWinRate
     {
-        public List<HandRateData> DataList;
+        public List<HandCard> mHandCardList;
         public static void Statistics()
         {
 
@@ -27,12 +25,7 @@ namespace Hunter.TexasHoldem
         {
         }
     }
-
-    public class HandRateData
-    {
-        public List<Card> CardList;//nine cards
-    }
-
+    
     class Player
     {
         public List<Card> handCards = new List<Card>();
@@ -132,7 +125,8 @@ namespace Hunter.TexasHoldem
             }
         }
 
-        public static void Combination(List<Card> poolList, int iNum, List<Card> retList = null)//<T>
+        public delegate void DeleCardList(List<Card> inCardList);
+        public static void Combination(List<Card> poolList, int iNum, List<Card> retList = null, DeleCardList deleCardList = null)
         {
             Debug.Assert(iNum > 0);
             Debug.Assert(poolList.Count >= iNum);
@@ -147,7 +141,11 @@ namespace Hunter.TexasHoldem
                 foreach (var item in poolList)
                 {
                     retList.Add(item);
-                    GetHandResult(retList);
+                    if (deleCardList != null)
+                    {
+                        deleCardList.Invoke(retList);
+                        //GetHandResult(retList);
+                    }
                     retList.Remove(item);
                 }
                 return;
@@ -168,7 +166,7 @@ namespace Hunter.TexasHoldem
                 retList.Add(item);
                 next_poolList.Remove(item);
 
-                Combination(next_poolList, iNum - 1, retList);
+                Combination(next_poolList, iNum - 1, retList, deleCardList);
 
                 retList.Remove(item);
             }
@@ -242,7 +240,8 @@ namespace Hunter.TexasHoldem
 
         public static void Test()
         {
-            CalcBeginWinRate();
+            //CalcBeginWinRate();
+            CardStatistics.CalcHandCardWinRate();
         }
     }
 }

@@ -4,6 +4,26 @@ using System.Text;
 
 namespace Hunter.TexasHoldem
 {
+    public class CardType
+    {
+        public static int Count = 100;
+        public static int StraightFlush = Count--;
+        public static int FourKind = Count--;
+        public static int FullHouse = Count--;
+        public static int Flush = Count--;
+        public static int Straight = Count--;
+        public static int ThreeKind = Count--;
+        public static int TwoPairs = Count--;
+        public static int OnePairs = Count--;
+        public static int HighCard = Count--;
+    }
+
+    public class MaxCardType
+    {
+        public int iCardType;
+        public List<Card> cardList;
+    }
+
     public class CardCompare
     {
         #region #Compare
