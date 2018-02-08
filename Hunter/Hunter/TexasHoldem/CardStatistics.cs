@@ -13,7 +13,38 @@ namespace Hunter.TexasHoldem
 {
     public class CardList
     {
-        public List<Card> mCardList = new List<Card>();
+        public static List<Card> GetAllCardList()
+        {
+            List<Card> cardList = new List<Card>();
+            int id = 1;
+            for (int iColor = 1; iColor <= Color.Count; iColor++)
+            {
+                for (int iNum = 1; iNum <= 13; iNum++)
+                {
+                    Card card = new Card();
+                    card.id = id++;
+                    card.iColor = iColor;
+                    card.iNumber = iNum;
+                    cardList.Add(card);
+                }
+            }
+            return cardList;
+        }
+
+        public static List<Card> GetCardListByColor(List<Card> inCardList, int iColor)
+        {
+            List<Card> retList = new List<Card>();
+            foreach (var card in inCardList)
+            {
+                if (card.iColor != iColor)
+                {
+                    continue;
+                }
+                retList.Add(card);
+            }
+            return retList;
+        }
+
         public static string ToString(List<Card> inCardList)
         {
             string strCardList = "";
@@ -31,24 +62,6 @@ namespace Hunter.TexasHoldem
         public static List<List<Card>> sHandCardList = new List<List<Card>>();
         public List<Card> mCardList = new List<Card>();
 
-        public static List<Card> GetAllCardList()
-        {
-            List<Card> cardList = new List<Card>();
-            int id = 1;
-            for (int iColor = 1; iColor <= Color.Count; iColor++)
-            {
-                for (int iNum = 1; iNum <= 13; iNum++)
-                {
-                    Card card = new Card();
-                    card.id = id++;
-                    card.iColor = iColor;
-                    card.iNumber = iNum;
-                    cardList.Add(card);
-                }
-            }
-            //PrintAllCard();
-            return cardList;
-        }
 
         public static List<Card> CopyCardList(List<Card> inCardList)
         {
@@ -60,14 +73,51 @@ namespace Hunter.TexasHoldem
             return retList;
         }
 
-        public static void Combination(List<Card> poolList, int iNum)
+
+        public delegate void DeleCardList(List<Card> inCardList);
+        public static void Combination(List<Card> poolList, int iNum, List<Card> retList = null, DeleCardList deleCardList = null)
         {
-            for (int i = 0; i < iNum; i++)
+            Debug.Assert(iNum > 0);
+            Debug.Assert(poolList.Count >= iNum);
+
+            if (retList == null)
             {
-                for (int j = 0; j < poolList.Count; j++)
+                retList = new List<Card>();
+            }
+
+            if (iNum == 1)
+            {
+                foreach (var item in poolList)
                 {
-                    Card card = poolList[j];
+                    retList.Add(item);
+                    if (deleCardList != null)
+                    {
+                        deleCardList.Invoke(retList);
+                        //GetHandResult(retList);
+                    }
+                    retList.Remove(item);
                 }
+                return;
+            }
+
+            List<Card> next_poolList = new List<Card>();
+            foreach (var item in poolList)
+            {
+                next_poolList.Add(item);
+            }
+            for (int i = 0; i < poolList.Count - 1; i++)
+            {
+                if (next_poolList.Count < iNum)
+                {
+                    return;
+                }
+                var item = poolList[i];
+                retList.Add(item);
+                next_poolList.Remove(item);
+
+                Combination(next_poolList, iNum - 1, retList, deleCardList);
+
+                retList.Remove(item);
             }
         }
 
@@ -116,43 +166,64 @@ namespace Hunter.TexasHoldem
             GetAllHandCardList();
         }
 
-        public static void GetAllHandCardList()
+        public static List<List<Card>> GetAllHandCardList()
         {
             List<List<Card>> allHandCardList = new List<List<Card>>();
-            List<Card> allCardList = GetAllCardList();
-            List<Card> poolList = CopyCardList(allCardList);
-            List<Card> retList = new List<Card>();
-            foreach (var card1 in allCardList)
+
+            List<Card> allCardList = CardList.GetAllCardList();
+            List<Card> spadeCardList = CardList.GetCardListByColor(allCardList, Color.Spade);
+            List<Card> heartCardList = CardList.GetCardListByColor(allCardList, Color.Heart);
+            
+            //same color
+            int iSameColor = 0;
+            for (int i = 0; i < spadeCardList.Count; i++)
             {
-                if (card1.iColor != Color.Spade)
+                var card1 = spadeCardList[i];
+                for (int j = i + 1; j < spadeCardList.Count; j++)
                 {
-                    continue;
+                    var card2 = spadeCardList[j];
+                    List<Card> handCard = new List<Card>();
+                    handCard.Add(card1);
+                    handCard.Add(card2);
+                    allHandCardList.Add(handCard);
+                    iSameColor++;
                 }
-                poolList.Remove(card1);
-                retList.Add(card1);
-
-                if (poolList.Count == 0)
-                {
-                    continue;
-                }
-
-                foreach (var card2 in poolList)
-                {
-                    if (card2.iColor == Color.Club || card2.iColor == Color.Diamond)
-                    {
-                        continue;
-                    }
-                    retList.Add(card1);
-                    allHandCardList.Add(retList);
-                    retList.Remove(card1);
-                }
-
-                retList.Remove(card1);
-                //poolList.Add(card1);
             }
+            Utility.Log("iSameColor = " + iSameColor);
 
+            //diff color include same number
+            int iDiffColor = 0;
+            for (int i = 0; i < spadeCardList.Count; i++)
+            {
+                var card1 = spadeCardList[i];
+                for (int j = i; j < heartCardList.Count; j++)
+                {
+                    var card2 = heartCardList[j];
+                    List<Card> handCard = new List<Card>();
+                    handCard.Add(card1);
+                    handCard.Add(card2);
+                    allHandCardList.Add(handCard);
+                    iDiffColor++;
+                }
+            }
+            Utility.Log("iDiffColor = " + iDiffColor);
+            
             Utility.Log("allHandCardList.Count = " + allHandCardList.Count);
+            Utility.Log("It is gonna be 78, 78+13=91, 169");
 
+            return allHandCardList;
+        }
+
+        public static void GetAllOppoCardList()
+        {
+            List<List<Card>> allHandCardList = GetAllHandCardList();
+            List<Card> allCardList = CardList.GetAllCardList();
+
+            //spade spade VS spade spade
+            //spade spade VS heart heart //equal to (club club) (diamond diamond)
+            //spade spade VS spade heart //equal to (spade club) (spade diamond)
+            //spade spade vs heart club //equal to (heart diamond) (club diamond)
+            //spade heart vs club diamond
         }
 
         public static void DrawCard()

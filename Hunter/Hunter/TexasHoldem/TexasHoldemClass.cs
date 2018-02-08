@@ -85,4 +85,13 @@ namespace Hunter.TexasHoldem
         public int id;
         public List<Card> mCardList = new List<Card>();
     }
+
+    public class HandCardAgainstType
+    {
+        public const int SpadeSpade_VS_SpadeSpade = 1;
+        public const int SpadeSpade_VS_HeartHeart = 2;
+        public const int SpadeSpade_VS_SpadeHeart = 3;
+        public const int SpadeSpade_VS_HeartClub = 4;
+        public const int SpadeHeart_VS_ClubDiamond = 5;
+    }
 }
