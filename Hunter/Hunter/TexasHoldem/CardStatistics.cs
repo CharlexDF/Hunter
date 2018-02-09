@@ -168,6 +168,19 @@ namespace Hunter.TexasHoldem
 
         public static List<List<Card>> GetAllHandCardList()
         {
+            List<Card> allCardList = CardList.GetAllCardList();
+            List<List<Card>> allHandCardList = new List<List<Card>>();
+
+            Combination(allCardList, 2, null, (_CardList) => 
+            {
+                allHandCardList.Add(_CardList);
+            });
+
+            return null;
+        }
+
+        public static List<List<Card>> GetPruningHandCardList()
+        {
             List<List<Card>> allHandCardList = new List<List<Card>>();
 
             List<Card> allCardList = CardList.GetAllCardList();
@@ -216,8 +229,8 @@ namespace Hunter.TexasHoldem
 
         public static void GetAllOppoCardList()
         {
-            List<List<Card>> allHandCardList = GetAllHandCardList();
             List<Card> allCardList = CardList.GetAllCardList();
+            List<List<Card>> handCardList = GetAllHandCardList();
 
             //spade spade VS spade spade
             //spade spade VS heart heart //equal to (club club) (diamond diamond)
