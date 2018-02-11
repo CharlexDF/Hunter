@@ -164,6 +164,7 @@ namespace Hunter.TexasHoldem
         public static void CalcHandCardWinRate()
         {
             GetAllHandCardList();
+            GetAllPreFlopList();
         }
 
         public static List<List<Card>> GetAllHandCardList()
@@ -225,6 +226,41 @@ namespace Hunter.TexasHoldem
             Utility.Log("It is gonna be 78, 78+13=91, 169");
 
             return allHandCardList;
+        }
+
+        public static List<List<Card>> GetAllPreFlopList()
+        {
+            List<Card> allCardList = CardList.GetAllCardList();
+            List<Card> colorList = new List<Card>();
+            foreach (var card in allCardList)
+            {
+                if (card.iNumber == 1)
+                {
+                    colorList.Add(card);
+                }
+            }
+            
+            List<List<Card>> againstList = new List<List<Card>>();
+            foreach (var card1 in colorList)
+            {
+                foreach (var card2 in colorList)
+                {
+                    foreach (var card3 in colorList)
+                    {
+                        foreach (var card4 in colorList)
+                        {
+                            List<Card> cardList = new List<Card>();
+                            cardList.Add(card1);
+                            cardList.Add(card2);
+                            cardList.Add(card3);
+                            cardList.Add(card4);
+                            againstList.Add(cardList);
+                        }
+                    }
+                }
+            }
+            Utility.Log("againstList.Count = " + againstList.Count);
+            return againstList;
         }
 
         public static void GetAllOppoCardList()

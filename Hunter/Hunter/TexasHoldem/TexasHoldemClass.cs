@@ -104,10 +104,19 @@ namespace Hunter.TexasHoldem
 
     public class HandCardAgainstType
     {
+        //1 color
         public const int SpadeSpade_VS_SpadeSpade = 1;
+
+        //2 color
         public const int SpadeSpade_VS_SpadeHeart = 2;
         public const int SpadeSpade_VS_HeartHeart = 3;
-        public const int SpadeSpade_VS_HeartClub = 4;
-        public const int SpadeHeart_VS_ClubDiamond = 5;
+        public const int SpadeHeart_VS_SpadeHeart = 4;
+
+        //3 color
+        public const int SpadeSpade_VS_HeartClub = 5;
+        public const int SpadeHeart_VS_SpadeClub = 6;
+
+        //4 color
+        public const int SpadeHeart_VS_ClubDiamond = 7;
     }
 }
