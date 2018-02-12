@@ -13,22 +13,36 @@ namespace Hunter.TexasHoldem
 {
     public class CardList
     {
+        public static List<Card> AllCardList;
         public static List<Card> GetAllCardList()
         {
-            List<Card> cardList = new List<Card>();
-            int id = 1;
-            for (int iColor = 1; iColor <= Color.Count; iColor++)
+            if (AllCardList == null)
             {
-                for (int iNum = 1; iNum <= 13; iNum++)
+                AllCardList = new List<Card>();
+                int id = 1;
+                for (int iColor = 1; iColor <= Color.Count; iColor++)
                 {
-                    Card card = new Card();
-                    card.id = id++;
-                    card.iColor = iColor;
-                    card.iNumber = iNum;
-                    cardList.Add(card);
+                    for (int iNum = 1; iNum <= 13; iNum++)
+                    {
+                        Card card = new Card();
+                        card.id = id++;
+                        card.iColor = iColor;
+                        card.iNumber = iNum;
+                        AllCardList.Add(card);
+                    }
                 }
             }
-            return cardList;
+            return CopyCardList(AllCardList);
+        }
+
+        public static List<Card> CopyCardList(List<Card> inCardList)
+        {
+            List<Card> retList = new List<Card>();
+            foreach (var item in inCardList)
+            {
+                retList.Add(item);
+            }
+            return retList;
         }
 
         public static List<Card> GetCardListByColor(List<Card> inCardList, int iColor)
@@ -62,18 +76,7 @@ namespace Hunter.TexasHoldem
         public static List<List<Card>> sHandCardList = new List<List<Card>>();
         public List<Card> mCardList = new List<Card>();
 
-
-        public static List<Card> CopyCardList(List<Card> inCardList)
-        {
-            List<Card> retList = new List<Card>();
-            foreach (var item in inCardList)
-            {
-                retList.Add(item);
-            }
-            return retList;
-        }
-
-
+        
         public delegate void DeleCardList(List<Card> inCardList);
         public static void Combination(List<Card> poolList, int iNum, List<Card> retList = null, DeleCardList deleCardList = null)
         {
@@ -121,10 +124,40 @@ namespace Hunter.TexasHoldem
             }
         }
 
-        public bool IsSameSituation()
+        public static void CombinePreList(List<Card> preList, int iNum, DeleCardList deleCardList = null)
         {
-            return false;
+            List<List<Card>> retList = new List<List<Card>>();
+            List<Card> poolList = CardList.GetAllCardList();
+
+            for (int i = 0; i < 1; i++)
+            {
+                if (preList == null)
+                {
+                    break;
+                }
+                if (preList.Count == 0)
+                {
+                    break;
+                }
+                foreach (var card in preList)
+                {
+                    if (poolList.Contains(card) == false)
+                    {
+                        Utility.Log("poolList.Contains(card) == false");
+                    }
+                    poolList.Remove(card);
+                }
+            }
+
+            Combination(poolList, 2, preList, deleCardList);
         }
+
+        public static void CombineAllCard(int iNum, DeleCardList deleCardList = null)
+        {
+            List<Card> allCardList = CardList.GetAllCardList();
+            Combination(allCardList, 2, null, deleCardList);
+        }
+        
 
         public int GetSituationID()
         {
@@ -164,7 +197,7 @@ namespace Hunter.TexasHoldem
         public static void CalcHandCardWinRate()
         {
             GetAllHandCardList();
-            GetAllPreFlopList();
+            GetHandCardAgainstList();
         }
 
         public static List<List<Card>> GetAllHandCardList()
@@ -176,6 +209,8 @@ namespace Hunter.TexasHoldem
             {
                 allHandCardList.Add(_CardList);
             });
+
+            Utility.Log("allHandCardList.Count = " + allHandCardList.Count);
 
             return null;
         }
@@ -231,6 +266,7 @@ namespace Hunter.TexasHoldem
         public static List<List<Card>> GetAllPreFlopList()
         {
             List<Card> allCardList = CardList.GetAllCardList();
+            
             List<Card> colorList = new List<Card>();
             foreach (var card in allCardList)
             {
@@ -263,17 +299,49 @@ namespace Hunter.TexasHoldem
             return againstList;
         }
 
+        public static void GetHandCardAgainstList()
+        {
+            List<Card> allCardList = CardList.GetAllCardList();
+            List<List<Card>> againstList = new List<List<Card>>();
+
+            Combination(allCardList, 4, null, (_CardList) =>
+            {
+                againstList.Add(_CardList);
+            });
+
+            Utility.Log("againstList.Count = " + againstList.Count);
+        }
+
         public static void GetAllOppoCardList()
         {
             List<Card> allCardList = CardList.GetAllCardList();
-            List<List<Card>> handCardList = GetAllHandCardList();
+            List<List<Card>> allHandCardList = GetAllHandCardList();
+            List<List<Card>> allOppoCardList = new List<List<Card>>();
 
+            foreach (var handCardList in allHandCardList)
+            {
+                List<Card> poolList = CardList.CopyCardList(allCardList);
+                foreach (var card in handCardList)
+                {
+                    if (poolList.Contains(card) == false)
+                    {
+                        Utility.Log("poolList.Contains(card) == false");
+                    }
+                    poolList.Remove(card);
+                }
+
+                Combination(allCardList, 2, null, (_CardList) =>
+                {
+                    allHandCardList.Add(_CardList);
+                });
+            }
             //spade spade VS spade spade
             //spade spade VS heart heart //equal to (club club) (diamond diamond)
             //spade spade VS spade heart //equal to (spade club) (spade diamond)
             //spade spade vs heart club //equal to (heart diamond) (club diamond)
             //spade heart vs club diamond
         }
+
 
         public static void DrawCard()
         {
