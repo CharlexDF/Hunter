@@ -1,28 +1,14 @@
 ############
-#Client
+#Hunter
 ############
-/Client/Assets/XLua/Gen/*
-/Client/Assets/XLua/Gen.meta
-/Client/Assets/UnityVS/*
-/Client/Assets/UnityVS.meta
-/Client/Assets/StreamingAssets/*
-/Client/Assets/StreamingAssets.meta
-/Client/Assets/Resources/Lua
-/Client/ABResource/*
-/Client/Library/*
-/Client/Temp/*
-/Client/.vs/*
-/Client/*.sln
-/Client/*.csproj
-/Client/__kellylog.txt
-/Client/Commands.log.xml
-/Client/Assets/AssetBundles
-/Client/Assets/AssetBundles.meta
-/Client/Assets/Plugins/Android/*
-/Client/Assets/Settings/Cache.txt
-/Client/Assets/Settings/Cache.txt.meta
-/Client/Assets/Resources/Lua.meta
-/Client/BattleTestFolder/BattleTestEditorData.txt
+/Hunter/.vs
+/Hunter/Hunter/Properties
+/Hunter/Hunter/bin/Debug
+
+############
+#TexasHoldem
+############
+/TexasHoldem/Log
 
 ############
 #Server
@@ -32,25 +18,9 @@
 /Server/*/target/*
 /Server/*/logs/*
 /Server/*/bin/*
-/Server/rconf/enduring
 /Server/*/*.iml
-/Server/zookeeper/data
 /Server/run_my.cmd
-/Server/.m2
 
-############
-#Other
-############
-/BuildScripts/version.txt
-/BuildScripts/tail.pyc
-
-############
-#package
-############
-/apks/*
-/apks_dev/*
-/apps/*
-/apps_dev/*
 
 
 ############
