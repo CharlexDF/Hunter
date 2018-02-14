@@ -14,18 +14,6 @@ namespace Hunter.TexasHoldem
         public int iWinRate;
     }
     
-    public class HandCardWinRate
-    {
-        public List<HandCard> mHandCardList;
-        public static void Statistics()
-        {
-
-        }
-        public static void PrintHandWinRate()
-        {
-        }
-    }
-    
     class Player
     {
         public List<Card> handCards = new List<Card>();
@@ -241,7 +229,7 @@ namespace Hunter.TexasHoldem
         public static void Test()
         {
             //CalcBeginWinRate();
-            CardStatistics.CalcHandCardWinRate();
+            CardStatistics.CalcAllHandCardAgainstResult();
         }
     }
 }

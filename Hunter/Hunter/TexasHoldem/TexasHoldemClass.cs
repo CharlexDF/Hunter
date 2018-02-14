@@ -1,6 +1,13 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+using System.Threading;
+using System.Diagnostics;
+using System.Xml;
 
 namespace Hunter.TexasHoldem
 {
@@ -19,6 +26,11 @@ namespace Hunter.TexasHoldem
         public int id;
         public int iColor;
         public int iNumber;
+        public Card(int _iColor, int _iNumber)
+        {
+            iColor = _iColor;
+            iNumber = _iNumber;
+        }
         public int GetId()
         {
             return (iColor - 1) * 13 + iNumber;
@@ -80,30 +92,66 @@ namespace Hunter.TexasHoldem
         }
     }
 
-    public class HandCard
+    public class AgainstResult
     {
         public int id;
         public List<Card> mCardList;
-        public Card mCard1;
-        public Card mCard2;
-        public HandCard(Card _card1, Card _card2)
-        {
-            mCard1 = _card1;
-            mCard1 = _card1;
-            mCardList = new List<Card>();
-            mCardList.Add(mCard1);
-            mCardList.Add(mCard2);
-        }
+        public float fWinRate;
+        public float fDrawRate;
+        public float fLoseRate;
+
     }
 
-    public class HandCardType
+    public class HandCard
     {
         public const int SameColor = 1;
         public const int DiffColor = 2;
+        public int id;
+        public List<Card> mCardList;
+        //public Card mCard1;
+        //public Card mCard2;
+        public HandCard(List<Card> _CardList)
+        {
+            mCardList = _CardList;
+        }
+        public HandCard(Card _card1, Card _card2)
+        {
+            //mCard1 = _card1;
+            //mCard1 = _card1;
+            //mCardList = new List<Card>();
+            //mCardList.Add(mCard1);
+            //mCardList.Add(mCard2);
+        }
+        public static int GetHandId(List<Card> _HandCardList)
+        {
+            Debug.Assert(_HandCardList != null);
+            Debug.Assert(_HandCardList.Count != 2);
+            Card card1 = _HandCardList[0];
+            Card card2 = _HandCardList[1];
+            int iHandId = 0;
+            if (card1.iColor == card2.iColor)
+            {
+                Card tranCard1 = new Card(Color.Spade, card1.iNumber);
+                Card tranCard2 = new Card(Color.Spade, card2.iNumber);
+                iHandId = tranCard1.GetId() * 100 + tranCard2.GetId();
+            }
+            else
+            {
+                Card tranCard1 = new Card(Color.Spade, card1.iNumber);
+                Card tranCard2 = new Card(Color.Heart, card2.iNumber);
+                iHandId = tranCard1.GetId() * 100 + tranCard2.GetId();
+            }
+            return 0;
+        }
+        public static int GetOppoId()
+        {
+            return 0;
+        }
     }
 
-    public class HandCardAgainstType
+    public class AgainstType
     {
+        public const int None = 0;
         //1 color
         public const int SpadeSpade_VS_SpadeSpade = 1;
 
