@@ -210,46 +210,6 @@ namespace Hunter.TexasHoldem
             return iAgainstId;
         }
         
-        public static int GetAgainstType(List<Card> _CardList)
-        {
-            Debug.Assert(_CardList != null);
-            Debug.Assert(_CardList.Count == 4);
-
-            DeleCardList deleCardList = (_inCardList) => { };
-
-            int iAgainstType = AgainstType.None;
-            int iColorCount = CardList.GetColorCount(_CardList);
-            if (iColorCount == 1)
-            {
-                return AgainstType.SpadeSpade_VS_SpadeSpade;
-            }
-            else if (iColorCount == 2)
-            {
-                if (_CardList[0].iColor == _CardList[1].iColor && _CardList[2].iColor == _CardList[3].iColor)
-                {
-                    return AgainstType.SpadeSpade_VS_HeartHeart;
-                }
-                if (_CardList[0].iColor == _CardList[1].iColor || _CardList[2].iColor == _CardList[3].iColor)
-                {
-                    return AgainstType.SpadeSpade_VS_SpadeHeart;
-                }
-                return AgainstType.SpadeSpade_VS_SpadeHeart;
-            }
-            else if (iColorCount == 3)
-            {
-                if (_CardList[0].iColor == _CardList[1].iColor || _CardList[2].iColor == _CardList[3].iColor)
-                {
-                    return AgainstType.SpadeSpade_VS_HeartClub;
-                }
-                return AgainstType.SpadeHeart_VS_SpadeClub;
-            }
-            else if (iColorCount == 4)
-            {
-                return AgainstType.SpadeHeart_VS_ClubDiamond;
-            }
-
-            return iAgainstType;
-        }
         
         public static int GetSortedAgainstId(List<Card> _CardList)
         {

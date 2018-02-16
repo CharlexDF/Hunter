@@ -122,31 +122,6 @@ namespace Hunter.TexasHoldem
             //mCardList.Add(mCard1);
             //mCardList.Add(mCard2);
         }
-        public static int GetHandId(List<Card> _HandCardList)
-        {
-            Debug.Assert(_HandCardList != null);
-            Debug.Assert(_HandCardList.Count != 2);
-            Card card1 = _HandCardList[0];
-            Card card2 = _HandCardList[1];
-            int iHandId = 0;
-            if (card1.iColor == card2.iColor)
-            {
-                Card tranCard1 = new Card(Color.Spade, card1.iNumber);
-                Card tranCard2 = new Card(Color.Spade, card2.iNumber);
-                iHandId = tranCard1.GetId() * 100 + tranCard2.GetId();
-            }
-            else
-            {
-                Card tranCard1 = new Card(Color.Spade, card1.iNumber);
-                Card tranCard2 = new Card(Color.Heart, card2.iNumber);
-                iHandId = tranCard1.GetId() * 100 + tranCard2.GetId();
-            }
-            return 0;
-        }
-        public static int GetOppoId()
-        {
-            return 0;
-        }
     }
 
     public class AgainstType
@@ -166,5 +141,6 @@ namespace Hunter.TexasHoldem
 
         //4 color
         public const int SpadeHeart_VS_ClubDiamond = 7;
+        
     }
 }
