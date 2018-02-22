@@ -22,48 +22,6 @@ namespace Hunter.TexasHoldem
     public class TexasHoldem
     {
         public static SortedList<int, Card> AllCardList = new SortedList<int, Card>();
-        public static SortedList<int, Result> ResultList = new SortedList<int, Result>();
-        
-        public static SortedList<int, Card> CreateAllCardList()
-        {
-            if (AllCardList.Count != 0)
-            {
-                return AllCardList;
-            }
-            int id = 1;
-            for (int iColor = 1; iColor <= Color.Count; iColor++)
-            {
-                for (int iNum = 1; iNum <= 13; iNum++)
-                {
-                    Card card = new Card();
-                    card.id = id++;
-                    card.iColor = iColor;
-                    card.iNumber = iNum;
-                    AllCardList.Add(card.id, card);
-                }
-            }
-            //PrintAllCard();
-            return AllCardList;
-        }
-
-        public static List<Card> GetAllCardList()
-        {
-            List<Card> cardList = new List<Card>();
-            int id = 1;
-            for (int iColor = 1; iColor <= Color.Count; iColor++)
-            {
-                for (int iNum = 1; iNum <= 13; iNum++)
-                {
-                    Card card = new Card();
-                    card.id = id++;
-                    card.iColor = iColor;
-                    card.iNumber = iNum;
-                    cardList.Add(card);
-                }
-            }
-            //PrintAllCard();
-            return cardList;
-        }
         public static void PrintAllCard()
         {
             foreach (var item in AllCardList)
@@ -204,7 +162,7 @@ namespace Hunter.TexasHoldem
         public static void CalcBeginWinRate()
         {
             List<List<Card>> AllHandCard = new List<List<Card>>();
-            List<Card> poolList = GetAllCardList();
+            List<Card> poolList = new List<Card>();// GetAllCardList();
             List<Card> hands = new List<Card>();
             //Card cSA = poolList.Find(p => p.iColor == Color.Spade && p.iNumber == 1);
             //Card cHA = poolList.Find(p => p.iColor == Color.Heart && p.iNumber == 1);

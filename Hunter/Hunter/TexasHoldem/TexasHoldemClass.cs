@@ -30,6 +30,7 @@ namespace Hunter.TexasHoldem
         {
             iColor = _iColor;
             iNumber = _iNumber;
+            id = GetId();
         }
         public int GetId()
         {
@@ -142,5 +143,26 @@ namespace Hunter.TexasHoldem
         //4 color
         public const int SpadeHeart_VS_ClubDiamond = 7;
         
+    }
+
+    public class CardType
+    {
+        public static int Count = 100;
+        public static int StraightFlush = Count--;//同花顺
+        public static int FourKind = Count--;//四条
+        public static int FullHouse = Count--;//葫芦
+        public static int Flush = Count--;//同花
+        public static int Straight = Count--;//顺子
+        public static int ThreeKind = Count--;//三条
+        public static int TwoPairs = Count--;//两对
+        public static int OnePairs = Count--;//对子
+        public static int HighCard = Count--;//高牌
+        public static int None = Count--;
+
+        public static int GetCardType(List<Card> _CardList)
+        {
+            CardTypeCaculator cardType = new CardTypeCaculator(_CardList);
+            return 0;
+        }
     }
 }

@@ -1,110 +1,89 @@
 ﻿using System;
+using System.IO;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
+using System.Net;
+using System.Threading;
+using System.Diagnostics;
+using System.Xml;
 
 namespace Hunter.TexasHoldem
 {
-    public class CardType
-    {
-        public static int Count = 100;
-        public static int StraightFlush = Count--;
-        public static int FourKind = Count--;
-        public static int FullHouse = Count--;
-        public static int Flush = Count--;
-        public static int Straight = Count--;
-        public static int ThreeKind = Count--;
-        public static int TwoPairs = Count--;
-        public static int OnePairs = Count--;
-        public static int HighCard = Count--;
-    }
-
     public class MaxCardType
     {
         public int iCardType;
         public List<Card> cardList;
     }
 
-    public class CardCompare
+
+    public class CardTypeCaculator
     {
-        #region #Compare
-        public static int REqual = 0;
-        public static int RWin = 1;
-        public static int RLose = -1;
-        public static int CompareCards(List<Card> handCards, List<Card> opponentCards)
+        public int iCardType;
+        public List<Card> mCardList;
+        public List<Card> mMaxCardList;
+        public int[] arrNumCount;
+        public int[] arrColorCount;
+        public int iHighCard;
+        public int iPairA;
+        public int iPairB;
+
+        public CardTypeCaculator(List<Card> _CardList)
         {
-            return REqual;
+            Debug.Assert(_CardList != null);
+
+            iCardType = CardType.None;
+            mCardList = _CardList;
+            mMaxCardList = null;
+            arrNumCount = new int[14];
+            arrColorCount = new int[5];
+            iHighCard = 0;
         }
 
-        /*
-        public static int Count = 100;
-        public static int StraightFlush = Count--;
-        public static int FourKind = Count--;
-        public static int FullHouse = Count--;
-        public static int Flush = Count--;
-        public static int Straight = Count--;
-        public static int ThreeKind = Count--;
-        public static int TwoPairs = Count--;
-        public static int OnePairs = Count--;
-        public static int HighCard = Count--;
-        */
-        public static bool IsStraight(List<Card> cardList)
+        public void UpdateCardType(int _iCardType)
         {
-            return false;
+            if (_iCardType > iCardType)
+            {
+                iCardType = _iCardType;
+            }
+            iHighCard = 0;
         }
-        public static bool IsFlush(List<Card> cardList)
+        public void UpdateCardType(int _iCardType, int _iHighCard)
         {
-            return false;
+            if (_iCardType > iCardType)
+            {
+                iCardType = _iCardType;
+            }
+            iHighCard = _iHighCard;
         }
-        public static bool IsStraightFlush(List<Card> cardList)
+
+        public void ProcessSameNumber()
         {
-            return false;
-        }
-        public static bool IsFourKind(List<Card> cardList)
-        {
-            int iMaxSameNumCount = 0;
-            return iMaxSameNumCount == 4;
-        }
-        public static bool IsThreeKind(List<Card> cardList)
-        {
-            return false;
-        }
-        public static bool IsFullHouse(List<Card> cardList)
-        {
-            return false;
-        }
-        public static bool IsTwoPairs(List<Card> cardList)
-        {
-            return false;
-        }
-        public static bool IsOnePairs(List<Card> cardList)
-        {
-            return false;
-        }
-        public static int GetMaxSameCardType(List<Card> cardList)
-        {
-            int iFour = 0;
             int iThree = 0;
             int iTwo = 0;
             int iPairsCount = 0;
 
             int iMaxSameNumCount = 0;
-            int[] arrCount = new int[14];
+            arrNumCount = new int[14];
 
-            foreach (var item in cardList)
+            foreach (var item in mCardList)
             {
-                arrCount[item.iNumber] += 1;
+                arrNumCount[item.iNumber] += 1;
             }
-            for (int i = 1; i < arrCount.Length; i++)
+
+            for (int i = 1; i < arrNumCount.Length; i++)
             {
-                var iCount = arrCount[i];
+                var iCount = arrNumCount[i];
                 if (iCount == 4)
                 {
-                    iFour = i;
-                    break;
+                    UpdateCardType(CardType.FourKind, i);
+                    return;
                 }
                 if (iCount == 3 && i > iThree)
                 {
                     iThree = i;
+                    UpdateCardType(CardType.FourKind, i);
                 }
                 else if (iCount == 2)
                 {
@@ -116,23 +95,65 @@ namespace Hunter.TexasHoldem
                 }
             }
 
-            foreach (var item in arrCount)
+            foreach (var item in arrNumCount)
             {
                 if (item == 4)
                 {
-                    return CardType.FourKind;
+                    
                 }
             }
 
             if (iMaxSameNumCount == 4)
             {
+            }
+
+            UpdateCardType(CardType.HighCard);
+        }
+        public int CalcCardType()//PreProcess
+        {
+            foreach (var item in mCardList)
+            {
+                arrNumCount[item.iNumber] += 1;
+                arrColorCount[item.iColor] += 1;
+            }
+            
+            if (IsStraightFlush())
+            {
+                return CardType.StraightFlush;
+            }
+            if (IsFourKind())
+            {
                 return CardType.FourKind;
+            }
+            if (IsFullHouse())
+            {
+                return CardType.FullHouse;
+            }
+            if (IsFlush())
+            {
+                return CardType.Flush;
+            }
+            if (IsStraight())
+            {
+                return CardType.Straight;
+            }
+            if (IsThreeKind())
+            {
+                return CardType.ThreeKind;
+            }
+            if (IsTwoPairs())
+            {
+                return CardType.TwoPairs;
+            }
+            if (IsOnePairs())
+            {
+                return CardType.OnePairs;
             }
 
             return CardType.HighCard;
         }
-
-        public static int GetCardType(List<Card> cardList)
+        
+        public int CalcCardType(List<Card> cardList)
         {
             int iMaxSameNumCount = 0;
             int[] arrCount = new int[14];
@@ -157,13 +178,125 @@ namespace Hunter.TexasHoldem
 
             return CardType.HighCard;
         }
-        public static List<Card> GetMaxCards(List<Card> srcCards)
+
+        public List<Card> GetMaxCards(List<Card> srcCards)
         {
             List<Card> retCards = new List<Card>();
 
             return retCards;
         }
 
-        #endregion #Compare
+        public bool IsStraightFlush()
+        {
+            if (IsStraight() && IsFlush())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool IsFourKind()
+        {
+            foreach (var count in arrNumCount)
+            {
+                if (count == 4)
+                {
+                    UpdateCardType(CardType.FourKind);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsFullHouse()
+        {
+            int iThree = 0;
+            int iTwo = 0;
+            for (int i = 1; i < arrNumCount.Length; i++)
+            {
+                var iCount = arrNumCount[i];
+                if (iCount == 3 && i > iThree)
+                {
+                    iThree = i;
+                }
+                else if (iCount == 2 && i > iTwo)
+                {
+                    iTwo = i;
+                }
+                if (iThree > 0 && iTwo > 0)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsFlush()
+        {
+            foreach (var count in arrColorCount)
+            {
+                if (count == 5)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsStraight()
+        {
+            int iCombo = 0;
+            for (int i = 1; i < arrNumCount.Length; i++)
+            {
+                var iCount = arrNumCount[i];
+                if (iCount == 0)
+                {
+                    iCombo = 0;
+                    continue;
+                }
+                iCombo++;
+                if (iCombo == 5)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        
+        public bool IsThreeKind()
+        {
+            foreach (var count in arrNumCount)
+            {
+                if (count == 2)
+                {
+                    UpdateCardType(CardType.FourKind);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool IsTwoPairs()
+        {
+            return false;
+        }
+
+        public bool IsOnePairs()
+        {
+            return false;
+        }
+
+    }
+
+    public partial class CardCompare
+    {
+        public static int REqual = 0;
+        public static int RWin = 1;
+        public static int RLose = -1;
+        public static int CompareCards(List<Card> handCards, List<Card> opponentCards)
+        {
+            return REqual;
+        }
+        
     }
 }

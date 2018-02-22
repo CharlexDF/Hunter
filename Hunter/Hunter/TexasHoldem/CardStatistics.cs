@@ -67,7 +67,7 @@ namespace Hunter.TexasHoldem
 
         public static void CombinePreList(List<Card> preList, int iNum, DeleCardList deleCardList = null)
         {
-            List<List<Card>> retList = new List<List<Card>>();
+            List<Card> retList = new List<Card>();
             List<Card> poolList = CardList.GetAllCardList();
 
             for (int i = 0; i < 1; i++)
@@ -82,15 +82,13 @@ namespace Hunter.TexasHoldem
                 }
                 foreach (var card in preList)
                 {
-                    if (poolList.Contains(card) == false)
-                    {
-                        Utility.Log("poolList.Contains(card) == false");
-                    }
+                    Debug.Assert(poolList.Contains(card));
                     poolList.Remove(card);
+                    retList.Add(card);
                 }
             }
 
-            Combination(poolList, 2, preList, deleCardList);
+            Combination(poolList, 2, retList, deleCardList);
         }
 
         public static void CombineAllCard(int iNum, DeleCardList deleCardList = null)
@@ -200,7 +198,7 @@ namespace Hunter.TexasHoldem
             Debug.Assert(_CardList != null);
             Debug.Assert(_CardList.Count == 0);
 
-            int iAgainstId = GetAgainstType(_CardList);
+            int iAgainstId = CardList.GetAgainstType(_CardList);
 
             int iColorCount = CardList.GetColorCount(_CardList);
             foreach (var card in _CardList)
@@ -213,7 +211,7 @@ namespace Hunter.TexasHoldem
         
         public static int GetSortedAgainstId(List<Card> _CardList)
         {
-            int iAgainstType = GetAgainstType(_CardList);
+            int iAgainstType = CardList.GetAgainstType(_CardList);
             if (iAgainstType == AgainstType.SpadeSpade_VS_SpadeSpade)
             {
 
@@ -294,31 +292,50 @@ namespace Hunter.TexasHoldem
 
 
 
-        public static SortedList<HandCard, SortedList<HandCard, AgainstResult>> AllAgainstResultList = new SortedList<HandCard, SortedList<HandCard, AgainstResult>>();
-        public static void CalcAllHandCardAgainstResult()
+        public static SortedList<int, SortedList<int, AgainstResult>> AllAgainstResultList = new SortedList<int, SortedList<int, AgainstResult>>();
+        public static int CalcAllHandCardAgainstResult()
         {
             List<List<Card>> allHandCardList = GetPruningHandCardList();
-
-            foreach (var cardList in allHandCardList)
+            int iCount = 0;
+            foreach (var handCard in allHandCardList)
             {
-                HandCard handCard = new HandCard(cardList);
-                SortedList<HandCard, AgainstResult> againstResultList = new SortedList<HandCard, AgainstResult>();
+                SortedList<int, AgainstResult> againstResultList = new SortedList<int, AgainstResult>();
 
-                Debug.Assert(!AllAgainstResultList.ContainsKey(handCard));
-                AllAgainstResultList.Add(handCard, againstResultList);
+                int iHandCardId = CardList.GetHandId(handCard);
+                Debug.Assert(!AllAgainstResultList.ContainsKey(iHandCardId));
+                AllAgainstResultList.Add(iHandCardId, againstResultList);
 
-                CombinePreList(handCard.mCardList, 2, (_CardList) =>
+                CombinePreList(handCard, 2, (_CardList) =>
                 {
-                    HandCard oppoCard = new HandCard(_CardList);
-                    //check is oppoCard exist in handCardList
-                    if (!againstResultList.ContainsKey(oppoCard))
+                    Debug.Assert(_CardList != null);
+                    Debug.Assert(_CardList.Count == 4);
+                    List <Card> oppoCard = new List<Card>();
+                    oppoCard.Add(_CardList[2]);
+                    oppoCard.Add(_CardList[3]);
+
+                    int iOppoHandId = CardList.GetHandId(oppoCard);
+                    //check is exist in handCardList
+                    if (AllAgainstResultList.ContainsKey(iOppoHandId))
                     {
-                        AgainstResult againstResult = CalcAgainstResult(handCard.mCardList, oppoCard.mCardList);
-                        againstResultList.Add(oppoCard, againstResult);
+                        return;
                     }
+                    
+                    int iOppoCardId = CardList.GetOppoId(handCard, oppoCard);
+                    //check is exist in againstResultList
+                    if (againstResultList.ContainsKey(iOppoCardId))
+                    {
+                        return;
+                    }
+                    AgainstResult againstResult = CalcAgainstResult(handCard, oppoCard);
+                    againstResultList.Add(iOppoCardId, againstResult);
+                    iCount++;
                 });
 
             }
+
+            Utility.Log("CalcAllHandCardAgainstResult iCount = " + iCount);
+
+            return 0;
         }
 
         public static List<List<Card>> GetPruningHandCardList()
@@ -384,6 +401,12 @@ namespace Hunter.TexasHoldem
         {
 
         }
+
+
+
+
+
+
 
         public static void DrawCard()
         {
