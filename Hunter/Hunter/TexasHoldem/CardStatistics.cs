@@ -198,12 +198,13 @@ namespace Hunter.TexasHoldem
             Debug.Assert(_CardList != null);
             Debug.Assert(_CardList.Count == 0);
 
-            int iAgainstId = CardList.GetAgainstType(_CardList);
+            int iAgainstId = 0;
+            int iAgainstType = CardList.GetAgainstType(_CardList);
 
             int iColorCount = CardList.GetColorCount(_CardList);
             foreach (var card in _CardList)
             {
-                iAgainstId = iAgainstId * 100 + card.GetId();
+                iAgainstId = iAgainstType * 100 + card.GetId();
             }
             return iAgainstId;
         }
@@ -312,13 +313,6 @@ namespace Hunter.TexasHoldem
                     List <Card> oppoCard = new List<Card>();
                     oppoCard.Add(_CardList[2]);
                     oppoCard.Add(_CardList[3]);
-
-                    int iOppoHandId = CardList.GetHandId(oppoCard);
-                    //check is exist in handCardList
-                    if (AllAgainstResultList.ContainsKey(iOppoHandId))
-                    {
-                        return;
-                    }
                     
                     int iOppoCardId = CardList.GetOppoId(handCard, oppoCard);
                     //check is exist in againstResultList

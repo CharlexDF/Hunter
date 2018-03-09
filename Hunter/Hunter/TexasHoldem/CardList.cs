@@ -158,11 +158,21 @@ namespace Hunter.TexasHoldem
                 {
                     return AgainstType.SpadeSpade_VS_HeartHeart;
                 }
-                if (_CardList[0].iColor == _CardList[1].iColor || _CardList[2].iColor == _CardList[3].iColor)
+                else if (_CardList[0].iColor == _CardList[1].iColor && _CardList[2].iColor != _CardList[3].iColor)
                 {
                     return AgainstType.SpadeSpade_VS_SpadeHeart;
                 }
-                return AgainstType.SpadeSpade_VS_SpadeHeart;
+                else if (_CardList[0].iColor != _CardList[1].iColor && _CardList[2].iColor == _CardList[3].iColor)
+                {
+                    return AgainstType.SpadeHeart_VS_HeartHeart;
+                }
+                else if (_CardList[0].iColor != _CardList[1].iColor
+                    && _CardList[0].iColor == _CardList[2].iColor
+                    && _CardList[2].iColor == _CardList[3].iColor)
+                {
+                    return AgainstType.SpadeHeart_VS_HeartHeart;
+                }
+                //return AgainstType.SpadeSpade_VS_SpadeHeart;
             }
             else if (iColorCount == 3)
             {
@@ -216,7 +226,6 @@ namespace Hunter.TexasHoldem
             oppoCard.Add(_CardList[3]);
 
             int iOppoCardId = CardList.GetOppoId(handCard, oppoCard);
-
             return iOppoCardId;
         }
 

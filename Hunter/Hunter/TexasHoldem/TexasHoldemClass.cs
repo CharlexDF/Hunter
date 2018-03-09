@@ -127,22 +127,25 @@ namespace Hunter.TexasHoldem
 
     public class AgainstType
     {
-        public const int None = 0;
+        public static int Count = 0;
+        public static int None = 0;
         //1 color
-        public const int SpadeSpade_VS_SpadeSpade = 1;
+        public static int SpadeSpade_VS_SpadeSpade = Count++;
 
         //2 color
-        public const int SpadeSpade_VS_SpadeHeart = 2;
-        public const int SpadeSpade_VS_HeartHeart = 3;
-        public const int SpadeHeart_VS_SpadeHeart = 4;
+        public static int SpadeSpade_VS_SpadeHeart = Count++;
+        public static int SpadeSpade_VS_HeartHeart = Count++;
+        public static int SpadeHeart_VS_SpadeSpade = Count++;
+        public static int SpadeHeart_VS_SpadeHeart = Count++;
+        public static int SpadeHeart_VS_HeartHeart = Count++;
 
         //3 color
-        public const int SpadeSpade_VS_HeartClub = 5;
-        public const int SpadeHeart_VS_SpadeClub = 6;
+        public static int SpadeSpade_VS_HeartClub = Count++;
+        public static int SpadeHeart_VS_SpadeClub = Count++;
 
         //4 color
-        public const int SpadeHeart_VS_ClubDiamond = 7;
-        
+        public static int SpadeHeart_VS_ClubDiamond = Count++;
+
     }
 
     public class CardType
